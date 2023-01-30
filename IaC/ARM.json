@@ -1,0 +1,465 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "webAppName": {
+            "type": "string",
+            "defaultValue": "[concat('ConnectAid-webApp', uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "Web App can be assigned a name during deployment else a default name 
+                                is assigned"
+            }
+        },
+        "appServicePlanName": {
+            "type": "string",
+            "defaultValue": "[concat('ConnectAid-ASP-',uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "App Service Plan can be assigned a name during deployment else a default name 
+                                is assigned"
+            }
+        },
+        "appInsightName": {
+            "type": "string",
+            "defaultValue": "[concat('ConnectAid-applicationInsights-',uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "Application Insight can be assigned a name during deployment else a default name 
+                                is assigned"
+            }
+        },
+        "serverName": {
+            "type": "string",
+            "defaultValue": "[concat('ConnectAid-SQLServer-',uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "The name of the SQL logical server."
+            }
+        },
+        "sqlDBName": {
+            "type": "string",
+            "defaultValue": "[concat('ConnectAid-SQLDB-',uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "The name of the SQL Database."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "administratorLogin": {
+            "type": "string",
+            "metadata": {
+                "description": "The administrator username of the SQL logical server."
+            }
+        },
+        "administratorLoginPassword": {
+            "type": "secureString",
+            "metadata": {
+                "description": "The administrator password of the SQL logical server."
+            }
+        },
+        "appServiceHostingPlanName": {
+            "type": "string",
+            "defaultValue": "F1",
+            "metadata": {
+                "description": "Hosting Plan Name of App Service"
+            },
+            "allowedValues": [
+                //name  Tier          Full name
+                "D1", //Shared      an D1 Shared
+                "F1", //Free        an F1 Free
+                "B1", //Basic       an B1 Basic
+                "B2", //Basic       an B2 Basic
+                "B3", //Basic       an B3 Basic
+                "S1", //Standard    an S1 Standard
+                "S2", //Standard    an S2 Standard
+                "S3", //Standard    an S3 Standard
+                "P1", //Premium     an P1 Premium
+                "P2", //Premium     an P2 Premium
+                "P3", //Premium     an P3 Premium
+                "P1V2", //PremiumV2   an P1V2 PremiumV2
+                "P2V2", //PremiumV2   an P2V2 PremiumV2
+                "P3V2", //PremiumV2   an P3V2 PremiumV2
+                "I1", //Isolated    an I2 Isolated
+                "I2", //Isolated    an I2 Isolated
+                "I3", //Isolated    an I3 Isolated
+                "Y1", //Dynamic     a  function consumption plan
+                "EP1", //ElasticPremium
+                "EP2", //ElasticPremium
+                "EP3" //ElasticPremium
+            ]
+        },
+        "sqlServerHostingPlanName": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "metadata": {
+                "description": "Hosting Plan Name of SQL Server"
+            },
+            "allowedValues": [
+                //name
+                "System",
+                "Free",
+                "Basic",
+                "Standard",
+                "Premium",
+                "DataWarehouse",
+                "Stretch",
+                "GP_S_Gen5",
+                "GP_Gen5",
+                "HS_Gen5",
+                "BC_Gen5",
+                "GP_Fsv2"
+            ]
+        },
+        "keyVaultName": {
+            "type": "string",
+            "defaultValue":"[concat('CAid-KV-',uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "Specifies the name of the key vault."
+            }
+        },
+        "enabledForDeployment": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Specifies whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault."
+            }
+        },
+        "enabledForDiskEncryption": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Specifies whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys."
+            }
+        },
+        "enabledForTemplateDeployment": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Specifies whether Azure Resource Manager is permitted to retrieve secrets from the key vault."
+            }
+        },
+        "tenantId": {
+            "type": "string",
+            "defaultValue": "[subscription().tenantId]",
+            "metadata": {
+                "description": "Specifies the Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. Get   it by using Get-AzSubscription cmdlet."
+            }
+        },
+        "keysPermissions": {
+            "type": "array",
+            "defaultValue": [
+                "all"
+            ],
+            "metadata": {
+                "description": "Specifies the permissions to keys in the vault. Valid values are: all, encrypt, decrypt, wrapKey, unwrapKey, sign, verify, get, list, create, update, import, delete, backup, restore, recover, and purge."
+            }
+        },
+        "secretsPermissions": {
+            "type": "array",
+            "defaultValue": [
+                "all"
+            ],
+            "metadata": {
+                "description": "Specifies the permissions to secrets in the vault. Valid values are: all, get, list, set, delete, backup, restore, recover, and purge."
+            }
+        },
+        "KeyVaultskuName": {
+            "type": "string",
+            "defaultValue": "standard",
+            "allowedValues": [
+                "standard",
+                "premium"
+            ],
+            "metadata": {
+                "description": "Specifies whether the key vault is a standard vault or a premium vault."
+            }
+        },
+        "configStoreName": {
+            "type": "string",
+            "defaultValue": "[concat('appConfig-', uniqueString(resourceGroup().id))]",
+            "metadata": {
+                "description": "Specifies the name of the App Configuration store."
+            }
+        }
+
+    },
+    "resources": [
+        /* APP Service Plan */
+        {
+            "name": "[parameters('appServicePlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2021-03-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "[parameters('appServiceHostingPlanName')]",
+                "capacity": 1
+            },
+            "tags": {
+                "displayName": "[parameters('appServicePlanName')]"
+            },
+            "properties": {
+                "name": "[parameters('appServicePlanName')]"
+            }
+        },
+        /* Web App */
+        {
+            "name": "[parameters('webAppName')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2021-03-01",
+            "location": "[parameters('location')]",
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/',parameters('appServicePlanName'))]": "Resource",
+                "displayName": "[parameters('webAppName')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+            ],
+            "kind": "app",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "name": "[parameters('webAppName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',parameters('appServicePlanName'))]"
+            }
+
+        },
+        /* APP Insights */
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[parameters('appInsightName')]",
+            "location": "[parameters('location')]",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web",
+                "Flow_Type": "Bluefield",
+                "HockeyAppId": "string",
+                "Request_Source": "rest"
+                /* 
+                "RetentionInDays": "int",
+                "SamplingPercentage": "int",
+                "WorkspaceResourceId": "string"
+                "DisableIpMasking": "True",
+                "DisableLocalAuth": "True",
+                "ImmediatePurgeDataOn30Days": "bool",
+                "IngestionMode": "string",
+                "publicNetworkAccessForIngestion": "string",
+                "publicNetworkAccessForQuery": "string",
+                "ForceCustomerStorageForProfiler": "bool",
+                */
+            }
+        },
+        /* SQL Server*/
+        {
+            "name": "[parameters('serverName')]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2021-08-01-preview",
+            "location": "[parameters('location')]",
+            "properties": {
+                "administratorLogin": "[parameters('administratorLogin')]",
+                "administratorLoginPassword": "[parameters('administratorLoginPassword')]"
+            },
+            "resources": [
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2021-11-01-preview",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+                    ],
+                    "location": "[parameters('location')]",
+                    "name": "AllowAllWindowsAzureIps",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "0.0.0.0"
+                    }
+                }
+            ]
+        },
+        /* SQL Database*/
+        {
+            "name": "[format('{0}/{1}', parameters('serverName'), parameters('sqlDBName'))]",
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2021-08-01-preview",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('sqlServerHostingPlanName')]",
+                "tier": "[parameters('sqlServerHostingPlanName')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "autoPauseDelay": -1
+                /*
+                "catalogCollation": "string",
+                "collation": "string",
+                "createMode": "string",
+                "elasticPoolId": "string",
+                "federatedClientId": "string",
+                "highAvailabilityReplicaCount": "int",
+                "isLedgerOn": "bool",
+                "licenseType": "string",
+                "longTermRetentionBackupResourceId": "string",
+                "maintenanceConfigurationId": "string",
+                "maxSizeBytes": "int",
+                "minCapacity": "[json('decimal-as-string')]",
+                "readScale": "string",
+                "recoverableDatabaseId": "string",
+                "recoveryServicesRecoveryPointId": "string",
+                "requestedBackupStorageRedundancy": "string",
+                "restorableDroppedDatabaseId": "string",
+                "restorePointInTime": "string",
+                "sampleName": "string",
+                "secondaryType": "string",
+                "sourceDatabaseDeletionDate": "string",
+                "sourceDatabaseId": "string",
+                "sourceResourceId": "string",
+                "zoneRedundant": "bool"
+                */
+            }
+        },
+        /* Key Vault */
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2021-11-01-preview",
+            "name": "[parameters('keyVaultName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "enabledForDeployment": "[parameters('enabledForDeployment')]",
+                "enabledForDiskEncryption": "[parameters('enabledForDiskEncryption')]",
+                "enabledForTemplateDeployment": "[parameters('enabledForTemplateDeployment')]",
+                "enableRbacAuthorization": false,
+                "tenantId": "[parameters('tenantId')]",
+                "vaultUri": "[concat('https://' ,parameters('keyVaultName'),'.vault.azure.net/')]",
+                "accessPolicies": [
+                    {
+                        "objectId": "[reference(concat('Microsoft.Web/sites/',parameters('webAppName')), '2021-03-01','Full').identity.principalId]",
+                        "tenantId": "[parameters('tenantId')]",
+                        "permissions": {
+                            "keys": "[parameters('keysPermissions')]",
+                            "secrets": "[parameters('secretsPermissions')]"
+                        }
+                    },
+                     {
+                        "objectId": "ccd7bf31-fa65-43cc-b6cb-f42179d8710e",
+                        "tenantId": "[parameters('tenantId')]",
+                        "permissions": {
+                            "keys": "[parameters('keysPermissions')]",
+                            "secrets": "[parameters('secretsPermissions')]"
+                        }
+                    }      
+                ],
+                "sku": {
+                    "name": "[parameters('KeyVaultskuName')]",
+                    "family": "A"
+                },
+                "networkAcls": {
+                    "defaultAction": "Allow",
+                    "bypass": "AzureServices"
+                }
+            }
+        },
+        /* App Configuration */
+        {
+            "type": "Microsoft.AppConfiguration/configurationStores",
+            "apiVersion": "2021-10-01-preview",
+            "location": "[parameters('location')]",
+            "name": "[parameters('configStoreName')]",
+            "sku": {
+                "name": "standard"
+            },
+            "properties": {
+
+                /*
+                "createMode": "string",
+                "disableLocalAuth": "bool",
+                "enablePurgeProtection": "bool",
+                "encryption": {
+                    "keyVaultProperties": {
+                    "identityClientId": "string",
+                    "keyIdentifier": "string"
+                    }
+                },
+                "publicNetworkAccess": "string",
+                "softDeleteRetentionInDays": "int"
+                */
+            }
+        },
+
+        /* Azure SQL Database Connection String Secret*/
+        {
+            "name": "[concat(parameters('keyVaultName'), '/AzureSQLDatabase-ConnectionString')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "properties": {
+                "value": "[concat('Driver={ODBC Driver 13 for SQL Server};Server=tcp:',reference(parameters('serverName')).fullyQualifiedDomainName,',1433;Database=',parameters('sqlDBName'),';Uid=',reference(parameters('serverName')).administratorLogin,'@',parameters('serverName'),';Pwd=',parameters('administratorLoginPassword'),';Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+            ]
+        },
+        /* Azure SQL Server Name Secret*/
+        {
+            "name": "[concat(parameters('keyVaultName'), '/ServerName')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "properties": {
+                "value": "[concat(parameters('serverName'),'.database.windows.net')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+            ]
+        },
+        /* Azure SQL Database Name Secret*/
+        {
+            "name": "[concat(parameters('keyVaultName'), '/DBName')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "properties": {
+                "value": "[parameters('sqlDBName')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+            ]
+        },
+        /* Azure SQL Server Admin Login*/
+        {
+            "name": "[concat(parameters('keyVaultName'), '/DB-Server-Admin-Login')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "properties": {
+                "value": "[parameters('administratorLogin')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+            ]
+        },
+        /* Azure SQL Server Admin Login Password*/
+        {
+            "name": "[concat(parameters('keyVaultName'), '/DB-Server-Admin-Password')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "properties": {
+                "value": "[parameters('administratorLoginPassword')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+            ]
+        },
+        /* Azure App Insights Connection String*/
+        {
+            "name": "[concat(parameters('keyVaultName'), '/AppInsights-ConnectionString')]",
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "apiVersion": "2019-09-01",
+            "properties": {
+                "value": "[reference(concat('microsoft.insights/components/', parameters('appInsightName')), '2020-02-02').ConnectionString]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+            ]
+        }
+    ]
+}
