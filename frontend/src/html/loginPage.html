@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="../css/loginStyles.css">
+</head>
+
+<body>
+	<div class="container" id="container">
+        <!-- SIGN UP FORM -->
+		<div class="form-container sign-up-container">
+			<form action="#">
+				<span>Enter OTP Received on Registered Number </span>
+                <input type="number" id = "OTP" placeholder="6 digit OTP">
+				<button>Resend OTP</button>
+                <br><br>
+                <button>Login</button>
+			</form>
+		</div>
+        <!-- SIGN IN FORM -->
+		<div class="form-container sign-in-container">
+			<form action="#">
+				<h2>Enter Registered Number to Login</h2>
+				<input type="number" id = "phoneNumber" placeholder="Registered Number" />
+				<!-- <a href="#">Forgot your password?</a> -->
+				<button id="signUp">Send OTP</button>
+			</form>
+		</div>
+		<div class="overlay-container">
+			<div class="overlay">
+				<div class="overlay-panel overlay-left">
+                    <br>
+					<h1>Welcome to NSC - Community Security</h1>
+                    <br>
+                    <button class="ghost" id="signIn">Back to Login</button>
+				</div>
+				<div class="overlay-panel overlay-right">
+					<h1>Welcome to NSC - Community Security</h1>
+                    <!-- <button class="ghost" id="signIn">Send OTP</button> -->
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="../js/login.js"></script>
+</body>
+
+</html>
+<!-- 
+<div class="social-container">
+    <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+    <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+</div> -->
