@@ -238,7 +238,6 @@
                 "Flow_Type": "Bluefield",
                 "HockeyAppId": "string",
                 "Request_Source": "rest"
-                /* 
                 "RetentionInDays": "int",
                 "SamplingPercentage": "int",
                 "WorkspaceResourceId": "string"
@@ -249,7 +248,7 @@
                 "publicNetworkAccessForIngestion": "string",
                 "publicNetworkAccessForQuery": "string",
                 "ForceCustomerStorageForProfiler": "bool",
-                */
+                
             }
         },
         /* SQL Server*/
