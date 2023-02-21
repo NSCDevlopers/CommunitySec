@@ -11,5 +11,3 @@ az appconfig kv set-keyvault -n $1 --key ServerName  --secret-identifier $linkTo
 az appconfig kv set-keyvault -n $1 --key DB-Name  --secret-identifier $linkToVault/Secrets/DB-Name --yes
 az appconfig kv set-keyvault -n $1 --key DB-Server-Admin-Password  --secret-identifier $linkToVault/Secrets/DB-Server-Admin-Password --yes
 az appconfig kv set-keyvault -n $1 --key DB-Server-Admin-Login  --secret-identifier $linkToVault/Secrets/DB-Server-Admin-Login --yes
-az appconfig kv set-keyvault -n $1 --key AzureSQLDatabase-ConnectionString  --secret-identifier $linkToVault/Secrets/AzureSQLDatabase-ConnectionString --yes
-az appconfig kv set-keyvault -n $1 --key AppInsights-ConnectionString  --secret-identifier $linkToVault/Secrets/AppInsights-ConnectionString --yes
