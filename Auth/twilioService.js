@@ -6,7 +6,7 @@ const client = new twilio(accountSid, authToken);
 
 client.verify.services
   .create({
-    friendlyName: 'My Verify Service',
+    friendlyName: 'OTP Auth',
     codeLength: 6,
     timeout: 600,
   })
